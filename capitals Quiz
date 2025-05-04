@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capitals Quiz</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            height: 100px;
+            background: linear-gradient(135deg, #3a7bd5, #00d2ff);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px 10px 0 0;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .tagline {
+            text-align: center;
+            margin-bottom: 20px;
+            font-style: italic;
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .user-details-box {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .user-details-box h2 {
+            margin-bottom: 15px;
+            color: #444;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, #3a7bd5, #00d2ff);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .quiz-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .question-number {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .score {
+            font-size: 18px;
+            font-weight: 600;
+            color: #3a7bd5;
+        }
+
+        .question {
+            font-size: 20px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .option {
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option:hover {
+            background-color: #f5f7fa;
+        }
+
+        .option.selected {
+            background-color: #3a7bd5;
+            color: white;
+            border-color: #3a7bd5;
+        }
+
+        .option.correct {
+            background-color: #4caf50;
+            color: white;
+            border-color: #4caf50;
+        }
+
+        .option.incorrect {
+            background-color: #f44336;
+            color: white;
+            border-color: #f44336;
+        }
+
+        .feedback {
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .feedback.correct {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            display: block;
+        }
+
+        .feedback.incorrect {
+            background-color: #ffebee;
+            color: #c62828;
+            display: block;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .next-btn {
+            background: linear-gradient(135deg, #3a7bd5, #00d2ff);
+            color: white;
+        }
+
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .prev-btn {
+            background-color: #f5f7fa;
+            color: #666;
+        }
+
+        .prev-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        .progress-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .progress-box {
+            width: 30px;
+            height: 30px;
+            margin: 0 5px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .progress-box.unvisited {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+
+        .progress-box.visited {
+            background-color: #9c27b0;
+            color: white;
+        }
+
+        .progress-box.correct {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        .progress-box.incorrect {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .footer {
+            height: 60px;
+            background: linear-gradient(135deg, #3a7bd5, #00d2ff);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 0 0 10px 10px;
+            margin-top: auto;
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            padding: 0 20px;
+        }
+
+        .encouragement {
+            text-align: center;
+            margin-top: 10px;
+            font-style: italic;
+            color: #666;
+        }
+
+        .result-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .result-container h2 {
+            margin-bottom: 20px;
+            color: #444;
+        }
+
+        .result-user {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .result-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-item {
+            background-color: #f5f7fa;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #3a7bd5;
+            margin-bottom: 5px;
+        }
+
+        .result-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .result-btn {
+            background: linear-gradient(135deg, #3a7bd5, #00d2ff);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .result-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .analysis-btn {
+            background: linear-gradient(135deg, #4caf50, #8bc34a);
+        }
+
+        .analysis-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .analysis-question {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        @media (max-width: 600px) {
+            .header {
+                height: 80px;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .footer {
+                height: 50px;
+                font-size: 1.3rem;
+            }
+            
+            .user-profile {
+                position: static;
+                margin-bottom: 15px;
+                justify-content: center;
+                width: 100%;
+            }
+            
+            .quiz-container {
+                padding: 15px;
+            }
+            
+            .question {
+                font-size: 18px;
+            }
+            
+            .progress-box {
+                width: 25px;
+                height: 25px;
+                font-size: 14px;
+            }
+
+            .result-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const questions = [
+            {
+                question: "What is the national capital of India?",
+                options: ["Mumbai", "New Delhi", "Bangalore", "Kolkata"],
+                correctAnswer: "New Delhi",
+                explanation: "New Delhi has been the capital of India since 1911 when the British shifted the capital from Kolkata."
+            },
+            {
+                question: "Which city is considered the financial capital of India?",
+                options: ["Hyderabad", "Chennai", "Mumbai", "Pune"],
+                correctAnswer: "Mumbai",
+                explanation: "Mumbai is home to the Bombay Stock Exchange and many financial institutions."
+            },
+            {
+                question: "Which city is known as the technology hub of India?",
+                options: ["Bangalore", "Gurgaon", "Hyderabad", "Pune"],
+                correctAnswer: "Bangalore",
+                explanation: "Bangalore is home to many IT companies and is often called the Silicon Valley of India."
+            },
+            {
+                question: "Which city is known as the cultural capital of India?",
+                options: ["Kolkata", "Jaipur", "Varanasi", "Mumbai"],
+                correctAnswer: "Kolkata",
+                explanation: "Kolkata is renowned for its literary, artistic, and revolutionary heritage."
+            },
+            {
+                question: "Which city is known as the Pink City of India?",
+                options: ["Jaipur", "Jodhpur", "Udaipur", "Bikaner"],
+                correctAnswer: "Jaipur",
+                explanation: "Jaipur is called the Pink City because of the color of the stone used for its buildings."
+            },
+            {
+                question: "Which city is known as the City of Lakes in India?",
+                options: ["Nainital", "Udaipur", "Bhopal", "Pushkar"],
+                correctAnswer: "Udaipur",
+                explanation: "Udaipur is famous for its beautiful lakes, including Lake Pichola and Fateh Sagar Lake."
+            },
+            {
+                question: "Which city is known as the Silicon Valley of India?",
+                options: ["Hyderabad", "Bangalore", "Pune", "Chennai"],
+                correctAnswer: "Bangalore",
+                explanation: "Bangalore earned this nickname due to its position as India's leading IT exporter."
+            },
+            {
+                question: "Which city is known as the Manchester of India?",
+                options: ["Ahmedabad", "Surat", "Coimbatore", "Ludhiana"],
+                correctAnswer: "Ahmedabad",
+                explanation: "Ahmedabad is called the Manchester of India because of its thriving textile industry."
+            }
+        ];
+
+        const CapitalsQuiz = () => {
+            const [quizStarted, setQuizStarted] = useState(false);
+            const [userDetails, setUserDetails] = useState({
+                name: '',
+                age: ''
+            });
+            const [currentQuestion, setCurrentQuestion] = useState(0);
+            const [selectedOptions, setSelectedOptions] = useState(Array(questions.length).fill(null));
+            const [quizCompleted, setQuizCompleted] = useState(false);
+            const [visitedQuestions, setVisitedQuestions] = useState([0]);
+            const [showAnalysis, setShowAnalysis] = useState(false);
+
+            useEffect(() => {
+                if (quizStarted) {
+                    document.title = `Question ${currentQuestion + 1} | Capitals Quiz`;
+                } else if (quizCompleted) {
+                    document.title = "Results | Capitals Quiz";
+                } else {
+                    document.title = "Capitals Quiz";
+                }
+            }, [quizStarted, currentQuestion, quizCompleted]);
+
+            const handleStartQuiz = () => {
+                if (userDetails.name && userDetails.age) {
+                    setQuizStarted(true);
+                } else {
+                    alert("Please enter your name and age to start the quiz.");
+                }
+            };
+
+            const handleOptionSelect = (option) => {
+                const newSelectedOptions = [...selectedOptions];
+                newSelectedOptions[currentQuestion] = option;
+                setSelectedOptions(newSelectedOptions);
+            };
+
+            const handleNextQuestion = () => {
+                if (currentQuestion < questions.length - 1) {
+                    setCurrentQuestion(currentQuestion + 1);
+                    if (!visitedQuestions.includes(currentQuestion + 1)) {
+                        setVisitedQuestions([...visitedQuestions, currentQuestion + 1]);
+                    }
+                } else {
+                    setQuizCompleted(true);
+                }
+            };
+
+            const handlePrevQuestion = () => {
+                if (currentQuestion > 0) {
+                    setCurrentQuestion(currentQuestion - 1);
+                }
+            };
+
+            const handleQuestionNavigation = (index) => {
+                setCurrentQuestion(index);
+                if (!visitedQuestions.includes(index)) {
+                    setVisitedQuestions([...visitedQuestions, index]);
+                }
+            };
+
+            const handleRestartQuiz = () => {
+                setQuizStarted(false);
+                setQuizCompleted(false);
+                setShowAnalysis(false);
+                setCurrentQuestion(0);
+                setSelectedOptions(Array(questions.length).fill(null));
+                setVisitedQuestions([0]);
+                setUserDetails({
+                    name: '',
+                    age: ''
+                });
+            };
+
+            const toggleAnalysis = () => {
+                setShowAnalysis(!showAnalysis);
+            };
+
+            const calculateScore = () => {
+                return selectedOptions.filter((option, index) => 
+                    option === questions[index].correctAnswer
+                ).length;
+            };
+
+            const getProgressBoxClass = (index) => {
+                if (selectedOptions[index] === null) {
+                    return visitedQuestions.includes(index) ? "visited" : "unvisited";
+                } else if (selectedOptions[index] === questions[index].correctAnswer) {
+                    return "correct";
+                } else {
+                    return "incorrect";
+                }
+            };
+
+            const getEncouragementMessage = () => {
+                const score = calculateScore();
+                const percentage = (score / questions.length) * 100;
+                
+                const messages = [
+                    { threshold: 75, message: "🏆 Excellent! You're a capitals expert!" },
+                    { threshold: 50, message: "👍 Good job! You know your capitals well!" },
+                    { threshold: 25, message: "💪 Keep practicing! You're improving!" },
+                    { threshold: 0, message: "✨ Don't worry! Try again to learn more!" }
+                ];
+                
+                return messages.find(m => percentage >= m.threshold).message;
+            };
+
+            if (!quizStarted && !quizCompleted) {
+                return (
+                    <div className="container">
+                        <div className="header">
+                            <h1>CAPITALS QUIZ</h1>
+                        </div>
+                        <p className="tagline">Test your knowledge of Indian capitals!</p>
+                        
+                        <div className="user-details-box">
+                            <h2>Enter Your Details</h2>
+                            <div className="form-group">
+                                <label htmlFor="name">Name:</label>
+                                <input 
+                                    type="text" 
+                                    id="name" 
+                                    value={userDetails.name}
+                                    onChange={(e) => setUserDetails({...userDetails, name: e.target.value})}
+                                    placeholder="Enter your name"
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="age">Age:</label>
+                                <input 
+                                    type="number" 
+                                    id="age" 
+                                    value={userDetails.age}
+                                    onChange={(e) => setUserDetails({...userDetails, age: e.target.value})}
+                                    placeholder="Enter your age"
+                                />
+                            </div>
+                            <button className="start-btn" onClick={handleStartQuiz}>Start Quiz</button>
+                        </div>
+                        
+                        <div className="footer">
+                            CAPITALS QUIZ
+                        </div>
+                        <p className="encouragement">Challenge yourself and learn something new!</p>
+                    </div>
+                );
+            }
+
+            if (quizCompleted) {
+                const score = calculateScore();
+                const attempted = selectedOptions.filter(option => option !== null).length;
+                
+                return (
+                    <div className="container">
+                        <div className="header">
+                            <h1>CAPITALS QUIZ</h1>
+                        </div>
+                        
+                        <div className="result-container">
+                            <h2>Quiz Results</h2>
+                            
+                            <div className="result-user">
+                                <div>
+                                    <h3>{userDetails.name}</h3>
+                                    <p>{userDetails.age} years</p>
+                                </div>
+                            </div>
+                            
+                            <div className="result-stats">
+                                <div className="stat-item">
+                                    <div className="stat-value">{questions.length}</div>
+                                    <div>Total Questions</div>
+                                </div>
+                                <div className="stat-item">
+                                    <div className="stat-value">{attempted}</div>
+                                    <div>Attempted</div>
+                                </div>
+                                <div className="stat-item">
+                                    <div className="stat-value">{score}</div>
+                                    <div>Correct</div>
+                                </div>
+                                <div className="stat-item">
+                                    <div className="stat-value">{questions.length - score}</div>
+                                    <div>Incorrect</div>
+                                </div>
+                            </div>
+                            
+                            <div className="stat-item">
+                                <div className="stat-value" style={{color: '#00d2ff'}}>
+                                    {Math.round((score / questions.length) * 100)}%
+                                </div>
+                                <div>Score</div>
+                            </div>
+                            
+                            <div className="result-buttons">
+                                <button className="result-btn analysis-btn" onClick={toggleAnalysis}>
+                                    {showAnalysis ? 'Hide Analysis' : 'Show Analysis'}
+                                </button>
+                                <button className="result-btn" onClick={handleRestartQuiz}>Restart Quiz</button>
+                            </div>
+
+                            {showAnalysis && (
+                                <div className="analysis-container">
+                                    <h3>Question Analysis</h3>
+                                    {questions.map((q, index) => (
+                                        <div key={index} className="analysis-question">
+                                            <p><strong>Q{index + 1}:</strong> {q.question}</p>
+                                            <p>Your answer: {selectedOptions[index] || "Not attempted"}</p>
+                                            <p>Correct answer: {q.correctAnswer}</p>
+                                            <p>Explanation: {q.explanation}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                        
+                        <div className="footer">
+                            CAPITALS QUIZ
+                        </div>
+                        <p className="encouragement">{getEncouragementMessage()}</p>
+                    </div>
+                );
+            }
+
+            const currentQ = questions[currentQuestion];
+            const selectedOption = selectedOptions[currentQuestion];
+            const isCorrect = selectedOption === currentQ.correctAnswer;
+            const showFeedback = selectedOption !== null;
+
+            return (
+                <div className="container">
+                    <div className="header">
+                        <h1>CAPITALS QUIZ</h1>
+                    </div>
+                    
+                    {quizStarted && (
+                        <div className="user-profile">
+                            <div className="user-info">
+                                <span>{userDetails.name}</span>
+                                <span>{userDetails.age} years</span>
+                            </div>
+                        </div>
+                    )}
+                    
+                    <div className="quiz-container">
+                        <div className="question-header">
+                            <div className="question-number">
+                                Question <br />
+                                {currentQuestion + 1} of {questions.length}
+                            </div>
+                            <div className="score">
+                                Score: {calculateScore()} / {questions.length}
+                            </div>
+                        </div>
+                        
+                        <div className="question">{currentQ.question}</div>
+                        
+                        <div className="options">
+                            {currentQ.options.map((option, index) => (
+                                <div 
+                                    key={index}
+                                    className={`option 
+                                        ${selectedOption === option ? 'selected' : ''}
+                                        ${showFeedback && option === currentQ.correctAnswer ? 'correct' : ''}
+                                        ${showFeedback && selectedOption === option && !isCorrect ? 'incorrect' : ''}
+                                    `}
+                                    onClick={() => !showFeedback && handleOptionSelect(option)}
+                                >
+                                    {option}
+                                </div>
+                            ))}
+                        </div>
+                        
+                        {showFeedback && (
+                            <div className={`feedback ${isCorrect ? 'correct' : 'incorrect'}`}>
+                                {isCorrect ? (
+                                    <div>
+                                        <span style={{fontWeight: 'bold'}}>✅ Correct!</span> {currentQ.explanation}
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <span style={{fontWeight: 'bold'}}>❌ Incorrect.</span> The correct answer is <span style={{fontWeight: 'bold'}}>{currentQ.correctAnswer}</span>. {currentQ.explanation}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                        
+                        <div className="nav-buttons">
+                            <button 
+                                className="nav-btn prev-btn" 
+                                onClick={handlePrevQuestion}
+                                disabled={currentQuestion === 0}
+                            >
+                                Previous
+                            </button>
+                            <button 
+                                className="nav-btn next-btn" 
+                                onClick={handleNextQuestion}
+                                disabled={!visitedQuestions.includes(currentQuestion + 1) && currentQuestion === visitedQuestions[visitedQuestions.length - 1] && selectedOption === null}
+                            >
+                                {currentQuestion === questions.length - 1 ? "Finish" : "Next"}
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div className="progress-container">
+                        {questions.map((_, index) => (
+                            <div 
+                                key={index}
+                                className={`progress-box ${getProgressBoxClass(index)}`}
+                                onClick={() => handleQuestionNavigation(index)}
+                            >
+                                {index + 1}
+                            </div>
+                        ))}
+                    </div>
+                    
+                    <div className="footer">
+                        CAPITALS QUIZ
+                    </div>
+                    <p className="encouragement">Keep going! You're doing great!</p>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<CapitalsQuiz />);
+    </script>
+</body>
+</html>
